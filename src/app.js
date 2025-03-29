@@ -1,23 +1,28 @@
 const express = require("express");
-
+const connectDb = require("./config/database");
+const User = require("./models/user");
+require("./config/database");
 const app = express();
 
-app.use("/", (err, req, res, next) => {
-  if (err) {
-    console.log(err);
-    res.status(505).send("something went wrong!");
+app.use(express.json());
+
+app.post("/signup", async (req, res) => {
+  const user = new User(req.body);
+  try {
+    await user.save();
+    res.send("User Added Succesfully!");
+  } catch (error) {
+    res.status(400).send("Error saving the user data!" + error.message);
   }
 });
 
-app.get("/getUserData", (req, res) => {
-  // try {
-  throw new Error("sadasdasf");
-  res.send("User data sent!");
-  // } catch (error) {
-  //   res.status(500).send("Some Error: Contact support team!");
-  // }
-});
-
-app.listen(7777, (req, res) => {
-  console.log(`Express server is running on http://localhost:7777/`);
-});
+connectDb()
+  .then(() => {
+    console.log("Database connection established");
+    app.listen(7777, (req, res) => {
+      console.log(`Express server is running on http://localhost:7777/`);
+    });
+  })
+  .catch((error) => {
+    console.log("Database connection failed!");
+  });
