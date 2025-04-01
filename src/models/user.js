@@ -1,4 +1,5 @@
 const { Schema, model } = require("mongoose");
+const validator = require("validator");
 
 const userSchema = new Schema(
   {
@@ -15,10 +16,20 @@ const userSchema = new Schema(
       unique: true,
       lowercase: true,
       trim: true,
+      validate(value) {
+        if (!validator.isEmail(value)) {
+          throw new Error("Invalid email address: " + value);
+        }
+      },
     },
     password: {
       type: String,
       required: true,
+      validate(value) {
+        if (!validator.isStrongPassword(value)) {
+          throw new Error("Enter a Strong Password: " + value);
+        }
+      },
     },
     age: {
       type: Number,
@@ -36,6 +47,11 @@ const userSchema = new Schema(
       type: String,
       default:
         "https://upload.wikimedia.org/wikipedia/commons/1/12/User_icon_2.svg",
+      validate(value) {
+        if (!validator.isURL(value)) {
+          throw new Error("Invalid Photo URL: " + value);
+        }
+      },
     },
     about: {
       type: String,
